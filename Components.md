@@ -16,3 +16,5 @@ Hardware Sensors Used:
 
 - [Kit used for 1 relay, soil moisture, and pump](https://www.amazon.com/gp/product/B07TLRYGT1/ref=ppx_yo_dt_b_asin_title_o01_s00?ie=UTF8&psc=1)
 - [Grow light](https://www.amazon.com/gp/product/B07BBFY3CH/ref=ppx_yo_dt_b_asin_title_o01_s00?ie=UTF8&psc=1)
+
+- [Kit used for DHT11, 1 relay, and water level sensor](https://www.amazon.com/ELEGOO-Upgraded-Tutorial-Compatible-MEGA2560/dp/B01MG49ZQ5/ref=sr_1_3?keywords=elegoo+sensor+kit&qid=1579280832&sr=8-3)
