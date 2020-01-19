@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
+#include <SoftwareSerial.h>
+
 
 #define LOW_LIGHT 150
 #define AMBIENT_LIGHT 350
@@ -13,7 +15,19 @@
 #define LIGHT_PIN 2
 #define PUMP_PIN  3
 
+#define RX 10
+#define TX 11
+
 DHT dht(DHT11_PIN, DHT11);
+SoftwareSerial esp8266(RX,TX); //Define 8266 chip serial
+
+int countTrueCommand;
+int countTimeCommand; 
+boolean found = false; 
+int valSensor = 1;
+void sendCommand(String command, int maxTime, char readReplay[]);
+String AP = "iPhone";       // CHANGE ME
+String PASS = "hackathon"; // CHANGE ME
 
 void setup() {
   pinMode(LIGHT_PIN, OUTPUT);
@@ -23,8 +37,12 @@ void setup() {
   pinMode(WATER_PIN, INPUT);
   pinMode(PHOTO_PIN, INPUT);
   dht.begin();
-  Serial.begin(9600);
+  Serial.begin(9600); //Computer Connection
+  esp8266.begin(115200); //ESP8266 Connection
   delay(1000);
+  //sendCommand("AT",5,"OK");
+  sendCommand("AT+CWMODE=1",5,"OK");
+  sendCommand("AT+CWJAP=\""+ AP +"\",\""+ PASS +"\"",20,"OK");
 
   Serial.println("Testing Light");
   digitalWrite(LIGHT_PIN, HIGH);
@@ -60,3 +78,37 @@ void loop() {
 
   delay(1000);
 }
+
+void sendCommand(String command, int maxTime, char readReplay[]) {
+  Serial.print(countTrueCommand);
+  Serial.print(". at command => ");
+  Serial.print(command);
+  Serial.print(" ");
+  while(countTimeCommand < (maxTime*1))
+  {
+    esp8266.println(command);//at+cipsend
+    if(esp8266.find(readReplay))//ok
+    {
+      found = true;
+      break;
+    }
+  
+    countTimeCommand++;
+  }
+  
+  if(found == true)
+  {
+    Serial.println("OYI");
+    countTrueCommand++;
+    countTimeCommand = 0;
+  }
+  
+  if(found == false)
+  {
+    Serial.println("Fail");
+    countTrueCommand = 0;
+    countTimeCommand = 0;
+  }
+  
+  found = false;
+ }
