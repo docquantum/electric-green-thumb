@@ -2,6 +2,7 @@
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
 #include <SoftwareSerial.h>
+#include <WiFiEsp.h>
 
 
 #define LOW_LIGHT 150
@@ -15,8 +16,8 @@
 #define LIGHT_PIN 2
 #define PUMP_PIN  3
 
-#define RX 10
-#define TX 11
+#define RX 6
+#define TX 7
 
 DHT dht(DHT11_PIN, DHT11);
 SoftwareSerial esp8266(RX,TX); //Define 8266 chip serial
@@ -26,8 +27,9 @@ int countTimeCommand;
 boolean found = false; 
 int valSensor = 1;
 void sendCommand(String command, int maxTime, char readReplay[]);
-String AP = "iPhone";       // CHANGE ME
-String PASS = "hackathon"; // CHANGE ME
+char ssid[] = "iPhone";            // your network SSID (name)
+char pass[] = "hackathon";        // your network password
+int status = WL_IDLE_STATUS;     // the Wifi radio's status
 
 void setup() {
   pinMode(LIGHT_PIN, OUTPUT);
@@ -38,11 +40,20 @@ void setup() {
   pinMode(PHOTO_PIN, INPUT);
   dht.begin();
   Serial.begin(9600); //Computer Connection
-  esp8266.begin(115200); //ESP8266 Connection
+  esp8266.begin(9600); //ESP8266 Connection
   delay(1000);
-  //sendCommand("AT",5,"OK");
-  sendCommand("AT+CWMODE=1",5,"OK");
-  sendCommand("AT+CWJAP=\""+ AP +"\",\""+ PASS +"\"",20,"OK");
+
+  // Initializes the esp8266
+  WiFi.init(&esp8266);
+  // attempt to connect to WiFi network
+  while ( status != WL_CONNECTED) {
+    Serial.print("Attempting to connect to WPA SSID: ");
+    Serial.println(ssid);
+    // Connect to WPA/WPA2 network
+    status = WiFi.begin(ssid, pass);
+  }
+
+  Serial.println("You're connected to the network");
 
   Serial.println("Testing Light");
   digitalWrite(LIGHT_PIN, HIGH);
@@ -78,37 +89,3 @@ void loop() {
 
   delay(1000);
 }
-
-void sendCommand(String command, int maxTime, char readReplay[]) {
-  Serial.print(countTrueCommand);
-  Serial.print(". at command => ");
-  Serial.print(command);
-  Serial.print(" ");
-  while(countTimeCommand < (maxTime*1))
-  {
-    esp8266.println(command);//at+cipsend
-    if(esp8266.find(readReplay))//ok
-    {
-      found = true;
-      break;
-    }
-  
-    countTimeCommand++;
-  }
-  
-  if(found == true)
-  {
-    Serial.println("OYI");
-    countTrueCommand++;
-    countTimeCommand = 0;
-  }
-  
-  if(found == false)
-  {
-    Serial.println("Fail");
-    countTrueCommand = 0;
-    countTimeCommand = 0;
-  }
-  
-  found = false;
- }
