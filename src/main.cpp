@@ -1,13 +1,17 @@
 #include <Arduino.h>
-#include "DHT.h"
 #include <Adafruit_Sensor.h>
+#include <DHT.h>
 
-#define LIGHT_PIN   23  //D_out
-#define PUMP_PIN    22  //D_out (inverted)
-#define DHT11_PIN   32  //D_in/out
-#define SOIL_PIN    39  //A_in
-#define WATER_PIN   34  //A_in
-#define PHOTO_PIN   36  //A_in
+#define LOW_LIGHT 150
+#define AMBIENT_LIGHT 350
+#define BRIGHT_LIGHT 600
+
+#define PHOTO_PIN A0
+#define WATER_PIN A1
+#define SOIL_PIN  A2
+#define DHT11_PIN 4
+#define LIGHT_PIN 2
+#define PUMP_PIN  3
 
 DHT dht(DHT11_PIN, DHT11);
 
@@ -48,7 +52,7 @@ void loop() {
   Serial.print(dht.readHumidity(false));
   Serial.println(F("%\n"));
   
-  if(analogRead(PHOTO_PIN) < 1200){
+  if(analogRead(PHOTO_PIN) < LOW_LIGHT){
     digitalWrite(LIGHT_PIN, HIGH);
   } else{
     digitalWrite(LIGHT_PIN, LOW);
