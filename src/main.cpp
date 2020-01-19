@@ -23,7 +23,7 @@ void setup() {
   pinMode(WATER_PIN, INPUT);
   pinMode(PHOTO_PIN, INPUT);
   dht.begin();
-  Serial.begin(115200);
+  Serial.begin(9600);
   delay(1000);
 
   Serial.println("Testing Light");
